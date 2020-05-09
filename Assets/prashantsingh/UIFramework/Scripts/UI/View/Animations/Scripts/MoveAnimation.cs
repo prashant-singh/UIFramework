@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace Prashant
 {
-    public class MoveAnimation: BaseAnimation
+    [DisallowMultipleComponent]
+    public class MoveAnimation : BaseAnimation
     {
         public enum PositionType
         {
@@ -20,16 +21,9 @@ namespace Prashant
 
         public override void SetupAnimation(Transform _targetTransform)
         {
-            //#if UNITY_EDITOR
-            //screenWidth = GetComponentInParent<CanvasScaler>().GetComponent<RectTransform>().sizeDelta.x;
-            //screenHeight = GetComponentInParent<CanvasScaler>().GetComponent<RectTransform>().sizeDelta.y;
+
             screenWidth = Screen.width > 1080 ? Screen.width : 1080;
             screenHeight = Screen.height > 1920 ? Screen.height : 1920;
-
-            //#endif
-            //screenWidth = Screen.width;
-            //screenHeight = Screen.height;
-            //Debug.Log(transform.parent.name+" ScreenWidth "+screenWidth+" height "+screenHeight,gameObject);
             m_targetTransform = _targetTransform;
             _initPosition = _targetTransform.GetComponent<RectTransform>().anchoredPosition;
             switch (_startPositionType)
@@ -66,9 +60,15 @@ namespace Prashant
             }
         }
 
+
+
         public override void ShowAnimation(EnableDirection _direction, float contentMoveTime, Ease _animationEffect, TweenCallback doThisOnFinish)
         {
-            StopPreviousAnimation();
+            if (isAnimating)
+            {
+                m_targetTransform.DOKill();
+                doThisOnFinish?.Invoke();
+            }
             if (m_targetTransform == null)
             {
                 Debug.Log("Please Setup Animation before starting the animation");
@@ -79,30 +79,31 @@ namespace Prashant
             {
                 m_tempStartPos = GetStartPosition();
             }
+            isAnimating = true;
             m_targetTransform.GetComponent<RectTransform>().anchoredPosition = m_tempStartPos;
-            m_targetTransform.DOLocalMove(_initPosition, contentMoveTime).SetEase(_animationEffect).OnComplete(doThisOnFinish);
+            m_targetTransform.DOLocalMove(_initPosition, contentMoveTime).SetEase(_animationEffect).OnComplete(()=> { isAnimating = false;doThisOnFinish?.Invoke(); });
         }
 
         public override void HideAnimation(EnableDirection _direction, float contentMoveTime, Ease _animationEffect, TweenCallback doThisOnFinish)
         {
-            StopPreviousAnimation();
+            if (isAnimating)
+            {
+                m_targetTransform.DOKill();
+                doThisOnFinish?.Invoke();
+            }
             if (m_targetTransform == null)
             {
                 Debug.Log("Please Setup Animation before starting the animation");
                 return;
             }
+            isAnimating = true;
             Vector2 m_tempStartPos = _moveFromPosition;
             //Debug.Log(_direction);
             if (_direction == EnableDirection.Reverse)
             {
                 m_tempStartPos = GetStartPosition();
             }
-            m_targetTransform.DOLocalMove(m_tempStartPos, contentMoveTime).SetEase(_animationEffect).OnComplete(doThisOnFinish);
-        }
-
-        void StopPreviousAnimation()
-        {
-            m_targetTransform.DOKill();
+            m_targetTransform.DOLocalMove(m_tempStartPos, contentMoveTime).SetEase(_animationEffect).OnComplete(() => { isAnimating = false; doThisOnFinish?.Invoke(); });
         }
 
         public override void ResetAnimation()

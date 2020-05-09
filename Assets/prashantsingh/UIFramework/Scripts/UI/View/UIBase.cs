@@ -26,7 +26,7 @@ namespace Prashant
         Reverse
     }
 
-    public abstract class UIBase: MonoBehaviour
+    public abstract class UIBase : MonoBehaviour
     {
         protected Canvas _canvas;
         protected GraphicRaycaster _raycaster;
@@ -48,7 +48,7 @@ namespace Prashant
         public void OnElementShowAnimationStarted(IBaseCanvasStateListner _tempListener)
         {
             m_showAnimationListeners.Add(_tempListener);
-           
+
 
             if (!m_activeAnimationListeners.Contains(_tempListener))
                 m_activeAnimationListeners.Add(_tempListener);
@@ -58,7 +58,7 @@ namespace Prashant
         public void OnElementShowAnimationFinished(IBaseCanvasStateListner _tempListener)
         {
             m_showAnimationListeners.Remove(_tempListener);
-            
+
             if (m_showAnimationListeners.Count <= 0)
             {
                 OnScreenLoaded();
@@ -110,15 +110,21 @@ namespace Prashant
         // Show Canvas method to enable canvas component
         protected void ShowCanvas(EnableDirection m_direction)
         {
+           if (_canvas.enabled) return;
             _direction = m_direction;
             _currentState = CanvasState.Enabled;
             OnScreenShowCalled();
+            if (m_showAnimationListeners.Count <= 0)
+            {
+                OnScreenLoaded();
+            }
             EnableDisableCanvas(true);
         }
 
         // Hide Canvas method to disable canvas component
         protected void HideCanvas(EnableDirection m_direction)
         {
+            if (!_canvas.enabled) return;
             _direction = m_direction;
             _currentState = CanvasState.Disabled;
             OnScreenHideCalled();
@@ -126,6 +132,7 @@ namespace Prashant
             if (m_hideAnimationListeners.Count <= 0)
             {
                 EnableDisableCanvas(false);
+                OnScreenHidden();
             }
         }
 
@@ -144,7 +151,7 @@ namespace Prashant
         // Enable/Disable Canvas Component
         void EnableDisableCanvas(bool status)
         {
-            // Debug.Log("canvas state " + status + "", gameObject);
+            //Debug.Log("canvas state " + status + "", gameObject);
             _canvas.enabled = status;
         }
 

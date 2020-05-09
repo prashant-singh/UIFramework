@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace Prashant
 {
-    public class SimpleAnimation: MonoBehaviour, IBaseCanvasStateListner
+    public class SimpleAnimation : MonoBehaviour, IBaseCanvasStateListner
     {
         public bool shouldLookForBaseUI = true;
         [SerializeField] bool shouldLookForContent = false;
@@ -18,7 +18,7 @@ namespace Prashant
         public UnityEvent OnShowAnimationFinish;
         public UnityEvent OnHideAnimationFinish;
         bool hasAnimationComponent;
-        BaseAnimation _animationComponent;
+        BaseAnimation[] _animationComponent;
         UIBase _currentUIBase;
         Canvas _canvas;
         Transform _targetTransform;
@@ -30,7 +30,7 @@ namespace Prashant
 
         void Initialize()
         {
-            if (GetComponent<BaseAnimation>())
+            if (GetComponents<BaseAnimation>().Length > 0)
             {
                 if (GetComponent<Canvas>())
                 {
@@ -45,8 +45,11 @@ namespace Prashant
                 }
                 else
                     _targetTransform = transform;
-                _animationComponent = GetComponent<BaseAnimation>();
-                _animationComponent.SetupAnimation(_targetTransform);
+                _animationComponent = GetComponents<BaseAnimation>();
+                for (int count = 0; count < _animationComponent.Length; count++)
+                {
+                    _animationComponent[count].SetupAnimation(_targetTransform);
+                }
                 hasAnimationComponent = true;
                 if (shouldLookForBaseUI)
                     SubscribeToCanvasEvents();
@@ -72,13 +75,18 @@ namespace Prashant
 
         public void StartShowAnimation(EnableDirection _direction)
         {
+            //Debug.Log("StartShowAnimation ");
             if (!hasAnimationComponent)
                 Initialize();
             if (hasAnimationComponent)
             {
                 if (hasCanvas)
                     _canvas.enabled = true;
-                _animationComponent.ShowAnimation(_direction, showAnimationTime, showAnimationEffect, ShowAnimationComplete);
+
+                for (int count = 0; count < _animationComponent.Length; count++)
+                {
+                    _animationComponent[count].ShowAnimation(_direction, showAnimationTime, showAnimationEffect, ShowAnimationComplete);
+                }
                 if (_currentUIBase)
                 {
                     _currentUIBase.OnElementShowAnimationStarted(this);
@@ -93,11 +101,15 @@ namespace Prashant
 
         public void StartHideAnimation(EnableDirection _direction)
         {
+            //Debug.Log("HideAnimationCalled ");
             if (!hasAnimationComponent)
                 Initialize();
             if (hasAnimationComponent)
             {
-                _animationComponent.HideAnimation(_direction, hideAnimationTime, hideAnimationEffect, HideAnimationComplete);
+                for (int count = 0; count < _animationComponent.Length; count++)
+                {
+                    _animationComponent[count].HideAnimation(_direction, hideAnimationTime, hideAnimationEffect, HideAnimationComplete);
+                }
                 if (_currentUIBase)
                 {
                     _currentUIBase.OnElementHideAnimationStarted(this);
@@ -111,6 +123,7 @@ namespace Prashant
 
         void ShowAnimationComplete()
         {
+            //Debug.Log("CalledShowCompleted",gameObject);
             if (OnShowAnimationFinish != null)
             {
                 OnShowAnimationFinish.Invoke();
@@ -124,6 +137,7 @@ namespace Prashant
 
         void HideAnimationComplete()
         {
+            //Debug.Log("CalledHideCompleted");
             if (OnHideAnimationFinish != null)
             {
                 OnHideAnimationFinish.Invoke();
@@ -165,7 +179,10 @@ namespace Prashant
 
         public void ResetAnimation()
         {
-            _animationComponent.ResetAnimation();
+            for (int count = 0; count < _animationComponent.Length; count++)
+            {
+                _animationComponent[count].ResetAnimation();
+            }
         }
     }
 
