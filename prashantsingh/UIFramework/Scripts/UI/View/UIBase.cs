@@ -49,7 +49,6 @@ namespace Prashant
         {
             m_showAnimationListeners.Add(_tempListener);
 
-
             if (!m_activeAnimationListeners.Contains(_tempListener))
                 m_activeAnimationListeners.Add(_tempListener);
         }
@@ -110,21 +109,19 @@ namespace Prashant
         // Show Canvas method to enable canvas component
         protected void ShowCanvas(EnableDirection m_direction)
         {
-           if (_canvas.enabled) return;
             _direction = m_direction;
             _currentState = CanvasState.Enabled;
             OnScreenShowCalled();
+            EnableDisableCanvas(true);
             if (m_showAnimationListeners.Count <= 0)
             {
                 OnScreenLoaded();
             }
-            EnableDisableCanvas(true);
         }
 
         // Hide Canvas method to disable canvas component
         protected void HideCanvas(EnableDirection m_direction)
         {
-            if (!_canvas.enabled) return;
             _direction = m_direction;
             _currentState = CanvasState.Disabled;
             OnScreenHideCalled();
@@ -151,7 +148,7 @@ namespace Prashant
         // Enable/Disable Canvas Component
         void EnableDisableCanvas(bool status)
         {
-            //Debug.Log("canvas state " + status + "", gameObject);
+            Debug.Log("canvas state " + status + "", gameObject);
             _canvas.enabled = status;
         }
 

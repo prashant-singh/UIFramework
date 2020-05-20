@@ -18,7 +18,7 @@ namespace Prashant
         public UnityEvent OnShowAnimationFinish;
         public UnityEvent OnHideAnimationFinish;
         bool hasAnimationComponent;
-        BaseAnimation[] _animationComponent;
+        BaseAnimation[] _animationComponents;
         UIBase _currentUIBase;
         Canvas _canvas;
         Transform _targetTransform;
@@ -45,10 +45,10 @@ namespace Prashant
                 }
                 else
                     _targetTransform = transform;
-                _animationComponent = GetComponents<BaseAnimation>();
-                for (int count = 0; count < _animationComponent.Length; count++)
+                _animationComponents = GetComponents<BaseAnimation>();
+                for (int count = 0; count < _animationComponents.Length; count++)
                 {
-                    _animationComponent[count].SetupAnimation(_targetTransform);
+                    _animationComponents[count].SetupAnimation(_targetTransform);
                 }
                 hasAnimationComponent = true;
                 if (shouldLookForBaseUI)
@@ -75,17 +75,15 @@ namespace Prashant
 
         public void StartShowAnimation(EnableDirection _direction)
         {
-            //Debug.Log("StartShowAnimation ");
             if (!hasAnimationComponent)
                 Initialize();
             if (hasAnimationComponent)
             {
                 if (hasCanvas)
                     _canvas.enabled = true;
-
-                for (int count = 0; count < _animationComponent.Length; count++)
+                for (int count = 0; count < _animationComponents.Length; count++)
                 {
-                    _animationComponent[count].ShowAnimation(_direction, showAnimationTime, showAnimationEffect, ShowAnimationComplete);
+                    _animationComponents[count].ShowAnimation(_direction, showAnimationTime, showAnimationEffect, ShowAnimationComplete);
                 }
                 if (_currentUIBase)
                 {
@@ -101,14 +99,13 @@ namespace Prashant
 
         public void StartHideAnimation(EnableDirection _direction)
         {
-            //Debug.Log("HideAnimationCalled ");
             if (!hasAnimationComponent)
                 Initialize();
             if (hasAnimationComponent)
             {
-                for (int count = 0; count < _animationComponent.Length; count++)
+                for (int count = 0; count < _animationComponents.Length; count++)
                 {
-                    _animationComponent[count].HideAnimation(_direction, hideAnimationTime, hideAnimationEffect, HideAnimationComplete);
+                    _animationComponents[count].HideAnimation(_direction, hideAnimationTime, hideAnimationEffect, HideAnimationComplete);
                 }
                 if (_currentUIBase)
                 {
@@ -123,7 +120,6 @@ namespace Prashant
 
         void ShowAnimationComplete()
         {
-            //Debug.Log("CalledShowCompleted",gameObject);
             if (OnShowAnimationFinish != null)
             {
                 OnShowAnimationFinish.Invoke();
@@ -137,7 +133,6 @@ namespace Prashant
 
         void HideAnimationComplete()
         {
-            //Debug.Log("CalledHideCompleted");
             if (OnHideAnimationFinish != null)
             {
                 OnHideAnimationFinish.Invoke();
@@ -179,9 +174,9 @@ namespace Prashant
 
         public void ResetAnimation()
         {
-            for (int count = 0; count < _animationComponent.Length; count++)
+            for (int count = 0; count < _animationComponents.Length; count++)
             {
-                _animationComponent[count].ResetAnimation();
+                _animationComponents[count].ResetAnimation();
             }
         }
     }

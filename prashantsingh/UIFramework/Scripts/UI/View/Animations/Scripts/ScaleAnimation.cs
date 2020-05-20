@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 
@@ -10,7 +9,6 @@ namespace Prashant
     {
         Transform m_targetTransform;
         Vector2 _scaleFrom, _initScale;
-
         public override void SetupAnimation(Transform _targetTransform)
         {
             m_targetTransform = _targetTransform;
@@ -20,28 +18,15 @@ namespace Prashant
 
         public override void ShowAnimation(EnableDirection _direction, float _animationTime, Ease _animationEffect, TweenCallback _doThisOnFinish)
         {
-            if (isAnimating)
-            {
-                m_targetTransform.DOKill();
-                _doThisOnFinish?.Invoke();
-            }
-
-            isAnimating = true;
             if (m_targetTransform == null) Debug.Log("Please SetupAnimation before starting the animation");
             m_targetTransform.localScale = _scaleFrom;
-            m_targetTransform.DOScale(_initScale, _animationTime).SetEase(_animationEffect).OnComplete(() => { isAnimating = false; _doThisOnFinish?.Invoke(); });
+            m_targetTransform.DOScale(_initScale, _animationTime).SetEase(_animationEffect).OnComplete(_doThisOnFinish);
         }
 
         public override void HideAnimation(EnableDirection _direction, float _animationTime, Ease _animationEffect, TweenCallback _doThisOnFinish)
         {
-            if (isAnimating)
-            {
-                m_targetTransform.DOKill();
-                _doThisOnFinish?.Invoke();
-            }
-            isAnimating = true;
             if (m_targetTransform == null) Debug.Log("Please SetupAnimation before starting the animation");
-            m_targetTransform.DOScale(_scaleFrom, _animationTime).SetEase(_animationEffect).OnComplete(() => { isAnimating = false; _doThisOnFinish?.Invoke(); });
+            m_targetTransform.DOScale(_scaleFrom, _animationTime).SetEase(_animationEffect).OnComplete(_doThisOnFinish);
         }
 
         public override void ResetAnimation()
